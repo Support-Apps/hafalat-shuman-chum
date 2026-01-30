@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>הפעלת שומן חוּם</title>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --pink: #FFB6C1;
+            --mint: #98D4BB;
+            --gold: #D4AF37;
+            --dark: #2D3436;
+            --cream: #FFF9F5;
+            --orange-warm: #FF6B35;
+            --red-fire: #E63946;
+        }
+
+        body {
+            font-family: 'Heebo', sans-serif;
+            background: var(--cream);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--dark);
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        h1::after {
+            content: '🔥';
+            position: absolute;
+            animation: flame 0.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes flame {
+            from { transform: translateY(0) scale(1); }
+            to { transform: translateY(-5px) scale(1.1); }
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .upload-area {
+            background: white;
+            border: 3px dashed var(--pink);
+            border-radius: 25px;
+            padding: 40px 20px;
+            margin-bottom: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area:hover {
+            border-color: var(--gold);
+            transform: scale(1.02);
+        }
+
+        .upload-area.has-image {
+            border-style: solid;
+            border-color: var(--mint);
+            padding: 10px;
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .upload-hint {
+            font-size: 0.9rem;
+            color: #999;
+            margin-top: 8px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        #preview {
+            max-width: 100%;
+            max-height: 350px;
+            border-radius: 20px;
+            display: none;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            transition: transform 3s ease-in-out;
+        }
+
+        #preview.slimming {
+            transform: scaleX(0.85);
+        }
+
+        .preview-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .heat-overlay {
+            display: none;
+        }
+
+        .activate-btn {
+            background: var(--orange-warm);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Heebo', sans-serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .activate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(255, 107, 53, 0.5);
+        }
+
+        .activate-btn:active {
+            transform: translateY(0);
+        }
+
+        .activate-btn:disabled {
+            background: #ccc;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .activate-btn.burning {
+            background: var(--red-fire);
+            animation: burnBtn 0.3s ease-in-out infinite alternate;
+        }
+
+        @keyframes burnBtn {
+            from { box-shadow: 0 8px 25px rgba(230, 57, 70, 0.6); }
+            to { box-shadow: 0 12px 40px rgba(230, 57, 70, 0.8); }
+        }
+
+        .stats-panel {
+            background: white;
+            border-radius: 25px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            display: none;
+        }
+
+        .stats-panel.visible {
+            display: block;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .stat-value.highlight {
+            color: var(--red-fire);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            background: var(--orange-warm);
+        }
+
+        .message {
+            font-size: 1.1rem;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 15px;
+            display: none;
+        }
+
+        .message.success {
+            display: block;
+            background: rgba(152, 212, 187, 0.3);
+            color: #2D6A4F;
+            animation: pop 0.3s ease;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0.8); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .reset-btn {
+            background: transparent;
+            border: 2px solid var(--pink);
+            color: var(--dark);
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: 'Heebo', sans-serif;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            background: var(--pink);
+            color: white;
+        }
+
+        .info-box {
+            background: rgba(212, 175, 55, 0.15);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: right;
+        }
+
+        .info-box h3 {
+            color: var(--gold);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-box p {
+            font-size: 0.95rem;
+            color: #666;
+            line-height: 1.7;
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>הפעלת שומן חוּם </h1>
+        <p class="subtitle">העלי תמונה שלך והפעילי את חילוף החומרים ✨</p>
+
+        <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+            <div id="uploadContent">
+                <div class="upload-icon">📸</div>
+                <div class="upload-text">לחצי להעלאת תמונה</div>
+                <div class="upload-hint">JPG, PNG או GIF</div>
+            </div>
+            <div class="preview-container">
+                <img id="preview" alt="תצוגה מקדימה">
+            </div>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" onchange="handleImageUpload(event)">
+
+        <button class="activate-btn" id="activateBtn" disabled onclick="activateBrownFat()">
+            🔥 הפעלת שומן חוּם
+        </button>
+
+        <div class="stats-panel" id="statsPanel">
+            <div class="stat-row">
+                <span class="stat-label">🔥 שריפת קלוריות</span>
+                <span class="stat-value highlight" id="caloriesValue">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">⚖️ ירידה במשקל</span>
+                <span class="stat-value highlight" id="weightValue">0 ק"ג</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="message" id="successMessage">
+                🎉 מעולה! השומן החום הופעל בהצלחה!
+            </div>
+        </div>
+
+        <button class="reset-btn" id="resetBtn" style="display: none;" onclick="resetApp()">
+            🔄 התחלה מחדש
+        </button>
+
+        <div class="info-box">
+            <h3>💡 מה זה שומן חוּם?</h3>
+            <p>
+                שומן חוּם הוא רקמת שומן מיוחדת שהגוף משתמש בה ליצירת חוֹם ושריפת קלוריות.
+                כשהוא מופעל, הוא עוזר להגביר את חילוף החומרים ולשרוף אנרגיה.
+                אפליקציה זו היא להמחשה בלבד ונועדה להנאה! 😊
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let isActivating = false;
+        let animationInterval = null;
+
+        function resetApp() {
+            alert('מאפס...');
+            document.getElementById('preview').style.display = 'none';
+            document.getElementById('uploadContent').style.display = 'block';
+            document.getElementById('uploadArea').classList.remove('has-image');
+            document.getElementById('preview').classList.remove('slimming');
+            document.getElementById('activateBtn').disabled = true;
+            document.getElementById('activateBtn').classList.remove('burning');
+            document.getElementById('activateBtn').textContent = '🔥 הפעלת שומן חוּם';
+            document.getElementById('statsPanel').classList.remove('visible');
+            document.getElementById('successMessage').classList.remove('success');
+            document.getElementById('resetBtn').style.display = 'none';
+            document.getElementById('caloriesValue').textContent = '0';
+            document.getElementById('weightValue').textContent = '0 ק"ג';
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('fileInput').value = '';
+            isActivating = false;
+            if (animationInterval) {
+                clearInterval(animationInterval);
+                animationInterval = null;
+            }
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('preview');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    document.getElementById('uploadContent').style.display = 'none';
+                    document.getElementById('uploadArea').classList.add('has-image');
+                    document.getElementById('activateBtn').disabled = false;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function activateBrownFat() {
+            if (isActivating) return;
+            isActivating = true;
+
+            const btn = document.getElementById('activateBtn');
+            const statsPanel = document.getElementById('statsPanel');
+            const progressFill = document.getElementById('progressFill');
+            const successMessage = document.getElementById('successMessage');
+            const resetBtn = document.getElementById('resetBtn');
+
+            btn.classList.add('burning');
+            btn.textContent = '🔥 שורף...';
+            statsPanel.classList.add('visible');
+            
+            // Add slimming effect
+            document.getElementById('preview').classList.add('slimming');
+
+            // Animate stats
+            let progress = 0;
+            let calories = 0;
+            let weightLoss = 0;
+
+            animationInterval = setInterval(() => {
+                progress += 2;
+                calories += Math.floor(Math.random() * 50) + 30;
+                weightLoss = Math.floor(calories / 7.7); // roughly 7.7 calories per gram of fat
+
+                progressFill.style.width = progress + '%';
+                document.getElementById('caloriesValue').textContent = calories;
+                document.getElementById('weightValue').textContent = (weightLoss / 1000).toFixed(1) + ' ק"ג';
+
+                if (progress >= 100) {
+                    clearInterval(animationInterval);
+                    
+                    btn.classList.remove('burning');
+                    btn.textContent = '✅ הושלם!';
+                    btn.disabled = true;
+                    
+                    successMessage.classList.add('success');
+                    resetBtn.style.display = 'inline-block';
+                    
+                    isActivating = false;
+                }
+            }, 60);
+        }
+
+        // Drag and drop support
+        const uploadArea = document.getElementById('uploadArea');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'var(--gold)';
+            uploadArea.style.background = 'rgba(212, 175, 55, 0.1)';
+        });
+
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'var(--pink)';
+            uploadArea.style.background = 'white';
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'var(--pink)';
+            uploadArea.style.background = 'white';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type.startsWith('image/')) {
+                document.getElementById('fileInput').files = files;
+                handleImageUpload({ target: { files: files } });
+            }
+        });
+    </script>
+</body>
+</html>
